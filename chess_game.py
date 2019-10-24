@@ -110,7 +110,6 @@ class ChessGame:
             return False
         else:
             move = (rankO-rankI,fileO-fileI)
-            legal = False
             if piece == ROOK:
                 legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
             elif piece == BISHOP:
@@ -120,12 +119,17 @@ class ChessGame:
             elif piece == KNIGHT:
                 legal = self.IsLegalKnight(rankI, fileI, rankO, fileO)
             elif piece == QUEEN:
-                if rankI == rankO or fileI == fileO:
-                    legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
-                else:
-                    legal = self.IsLegalBishop(rankI, fileI, rankO, fileO)
+                legal = self.IsLegalQueen(rankI, fileI, rankO, fileO)
         if logError: self.error = "" if legal else "Illegal move!"
         return legal
+
+    def IsLegalQueen(self, rankI, fileI, rankO, fileO):
+        if IsLegalRook(self, rankI, fileI, rankO, fileO):
+            return True
+        elif IsLegalBishop(self, rankI, fileI, rankO, fileO):
+            return True
+        else:
+            return False
 
     def IsLegalRook(self, rankI, fileI, rankO, fileO):
         move = (rankO-rankI,fileO-fileI)
