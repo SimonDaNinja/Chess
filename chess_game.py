@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import numpy as np
-from constants.constants import *
+from chess.constants import *
 import os
 
 # vertical rows are called FILES
@@ -14,12 +14,12 @@ def ClearScreen():
 
 class ChessGame:
 
-    from constants.dicts import COLOR_DICTIONARY
-    from constants.dicts import PIECE_DICTIONARY
-    from constants.dicts import RANK_DICTIONARY
-    from constants.dicts import SYMBOL_DICT_FILLED
-    from constants.dicts import SYMBOL_DICT_EMPTY
-    from constants.dicts import MOVE_DICT
+    from chess.dicts import COLOR_DICTIONARY
+    from chess.dicts import PIECE_DICTIONARY
+    from chess.dicts import RANK_DICTIONARY
+    from chess.dicts import SYMBOL_DICT_FILLED
+    from chess.dicts import SYMBOL_DICT_EMPTY
+    from chess.dicts import MOVE_DICT
 
     def __init__(self):
         self.board = np.full((8,8,2),EMPTY)
