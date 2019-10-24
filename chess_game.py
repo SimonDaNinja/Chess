@@ -63,6 +63,7 @@ class ChessGame:
 
     def DispState(self):
         dispString = self.error + "\n"
+        dispString += "  a b c d e f g h\n"
         self.error = ""
         for file_ in range(8):
             dispString += str(7-file_+1)
@@ -81,6 +82,8 @@ class ChessGame:
                 else:
                     dispString += '\x1b[%sm \x1b[0m' % (fColor)
                 dispString += '\x1b[%sm \x1b[0m' % (fColor)
+            dispString += str(7-file_+1)
+            dispString += ' '
             dispString += '\n'
         dispString += "  a b c d e f g h\n"
         print(dispString)
