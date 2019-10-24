@@ -124,9 +124,9 @@ class ChessGame:
         return legal
 
     def IsLegalQueen(self, rankI, fileI, rankO, fileO):
-        if IsLegalRook(self, rankI, fileI, rankO, fileO):
+        if self.IsLegalRook(self, rankI, fileI, rankO, fileO):
             return True
-        elif IsLegalBishop(self, rankI, fileI, rankO, fileO):
+        elif self.IsLegalBishop(self, rankI, fileI, rankO, fileO):
             return True
         else:
             return False
