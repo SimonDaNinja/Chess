@@ -1,4 +1,4 @@
-from constants.constants import *
+from chess.constants import *
 
 COLOR_DICTIONARY = { WHITE:"white",
                      BLACK:"black" }
