@@ -111,23 +111,26 @@ class ChessGame:
         else:
             move = (rankO-rankI,fileO-fileI)
             legal = False
-            if move in self.MOVE_DICT[piece]:
-                legal = True
-                if piece == ROOK:
-                    legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
-                elif piece == BISHOP:
-                    legal = self.IsLegalBishop(rankI, fileI, rankO, fileO)
-                elif piece == QUEEN:
-                    if move[0] == 0 or move[1] == 0:
-                        legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
-                    else:
-                        legal = self.IsLegalBishop(rankI, fileI, rankO, fileO)
+            if piece == ROOK:
+                legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
+            elif piece == BISHOP:
+                legal = self.IsLegalBishop(rankI, fileI, rankO, fileO)
             elif piece == PAWN:
                 legal = self.IsLegalPawn(rankI, fileI, rankO, fileO, color)
+            elif piece == KNIGHT:
+                legal = self.IsLegalKnight(rankI, fileI, rankO, fileO)
+            elif piece == QUEEN:
+                if rankI == rankO or fileI == fileO:
+                    legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
+                else:
+                    legal = self.IsLegalBishop(rankI, fileI, rankO, fileO)
         if logError: self.error = "" if legal else "Illegal move!"
         return legal
 
     def IsLegalRook(self, rankI, fileI, rankO, fileO):
+        move = (rankO-rankI,fileO-fileI)
+        if not move in self.MOVE_DICT[ROOK]:
+            return False
         legal = True
         if rankI == rankO:
             maxFile = max(fileI,fileO)
@@ -146,6 +149,9 @@ class ChessGame:
         return legal
 
     def IsLegalBishop(self, rankI, fileI, rankO, fileO):
+        move = (rankO-rankI,fileO-fileI)
+        if not move in self.MOVE_DICT[BISHOP]:
+            return False
         legal = True
         rankSign = np.sign(rankO-rankI)
         fileSign = np.sign(fileO-fileI)
@@ -155,6 +161,10 @@ class ChessGame:
             if not legal:
                 return legal
         return legal
+
+    def IsLegalKnight(self, rankI, fileI, rankO, fileO):
+        move = (rankO-rankI,fileO-fileI)
+        return move in self.MOVE_DICT[KNIGHT]
 
     def IsLegalPawn(self, rankI, fileI, rankO, fileO, color):
         move = (rankO-rankI,fileO-fileI)
