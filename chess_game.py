@@ -1,7 +1,7 @@
+#!/usr/bin/python3
 import numpy as np
 from constants.constants import *
 import os
-BISHOP
 
 # vertical rows are called FILES
 # horizontal rows are called RANKS
