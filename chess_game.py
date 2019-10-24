@@ -88,7 +88,7 @@ class ChessGame:
         dispString += "  a b c d e f g h\n"
         print(dispString)
 
-    def MoveIsLegal(self, rankI, fileI, rankO, fileO, color, logError = True):
+    def IsLegalMove(self, rankI, fileI, rankO, fileO, color, logError = True):
         otherColor = int(not(color))
         piece = self.board[rankI, fileI, color]
 
@@ -172,7 +172,7 @@ class ChessGame:
     def Move(self, rankI, fileI, rankO, fileO, color):
         piece = self.board[rankI, fileI, color]
         otherColor = int(not(color))
-        legal = self.MoveIsLegal(rankI, fileI, rankO, fileO, color)
+        legal = self.IsLegalMove(rankI, fileI, rankO, fileO, color)
 
         if legal:
             self.board[rankI, fileI, color] = EMPTY
@@ -196,7 +196,7 @@ class ChessGame:
         for i in range(pieceCoords[0].size):
             rankI = pieceCoords[0][i]
             fileI = pieceCoords[1][i]
-            check = self.MoveIsLegal(rankI, fileI, rankO, fileO, otherColor, logError = False)
+            check = self.IsLegalMove(rankI, fileI, rankO, fileO, otherColor, logError = False)
             if check:
                 return True
         return False
@@ -212,7 +212,7 @@ class ChessGame:
             for move in self.MOVE_DICT[piece]:
                 rankO = move[0]
                 fileO = move[1]
-                legal = self.MoveIsLegal(rankI, fileI, rankO, fileO, color, logError = False)
+                legal = self.IsLegalMove(rankI, fileI, rankO, fileO, color, logError = False)
                 if legal:
                     otherColor = BLACK if color == WHITE else WHITE
                     self.board[rankI, fileI, color] = EMPTY
@@ -247,8 +247,8 @@ if __name__ == "__main__":
         while True:
             ClearScreen()
             chessGame.DispState()
-            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move!")
-            rankIStr = input("choose rank! [a-h]: ").lower()
+            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move")
+            rankIStr = input("choose rank [a-h]: ").lower()
             if rankIStr in "abcdefgh" and not rankIStr=="":
                 rankI = chessGame.RANK_DICTIONARY[rankIStr]
                 break
@@ -260,7 +260,7 @@ if __name__ == "__main__":
             chessGame.DispState()
             chessGame.IsCheckMate(WHITE)
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move!")
-            fileIStr = input("choose file! [1-8]: ").lower()
+            fileIStr = input("choose file [1-8]: ").lower()
             if fileIStr in "12345678" and not rankIStr=="":
                 fileI = int(fileIStr)-1
                 break
@@ -271,7 +271,7 @@ if __name__ == "__main__":
             ClearScreen()
             chessGame.DispState()
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move!")
-            rankOStr = input("choose rank! [a-h]: ").lower()
+            rankOStr = input("choose rank [a-h]: ").lower()
             if rankIStr in "abcdefgh" and not rankIStr=="":
                 rankO = chessGame.RANK_DICTIONARY[rankOStr]
                 break
@@ -282,7 +282,7 @@ if __name__ == "__main__":
             ClearScreen()
             chessGame.DispState()
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move!")
-            fileOStr = input("choose file! [1-8]: ").lower()
+            fileOStr = input("choose file [1-8]: ").lower()
             if fileOStr in "12345678" and not rankIStr=="":
                 fileO = int(fileOStr)-1
                 break
