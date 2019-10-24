@@ -43,7 +43,7 @@ class ChessGame:
         self.board[ G, 1, WHITE ] = PAWN
         self.board[ H, 1, WHITE ] = PAWN
 
-        # place all white pieces
+        # place all black pieces
         self.board[ A, 7, BLACK ] = ROOK
         self.board[ B, 7, BLACK ] = KNIGHT
         self.board[ C, 7, BLACK ] = BISHOP
