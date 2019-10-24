@@ -1,31 +1,31 @@
 from constants.constants import *
 
-COLOR_DICTIONARY = { 0:"white",
-                     1:"black" }
-PIECE_DICTIONARY = { 0:"empty",
-                    1:"bishop",
-                    2:"king",
-                    3:"knight",
-                    4:"pawn",
-                    5:"queen",
-                    6:"rook"}
+COLOR_DICTIONARY = { WHITE:"white",
+                     BLACK:"black" }
+PIECE_DICTIONARY = { EMPTY: "empty",
+                     BISHOP:"bishop",
+                     KING:  "king",
+                     KNIGHT:"knight",
+                     PAWN:  "pawn",
+                     QUEEN: "queen",
+                     ROOK:  "rook"}
 RANK_DICTIONARY = { 
-                    0:"a",
-                    1:"b",
-                    2:"c",
-                    3:"d",
-                    4:"e",
-                    5:"f",
-                    6:"g",
-                    7:"h",
-                    "a":0,
-                    "b":1,
-                    "c":2,
-                    "d":3,
-                    "e":4,
-                    "f":5,
-                    "g":6,
-                    "h":7
+                    A:"a",
+                    B:"b",
+                    C:"c",
+                    D:"d",
+                    E:"e",
+                    F:"f",
+                    G:"g",
+                    H:"h",
+                    "a":A,
+                    "b":B,
+                    "c":C,
+                    "d":D,
+                    "e":E,
+                    "f":F,
+                    "g":G,
+                    "h":H
                     }
 
 SYMBOL_DICT_FILLED = {   BISHOP: chr(9821),
