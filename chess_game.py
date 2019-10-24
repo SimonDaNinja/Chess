@@ -185,7 +185,6 @@ class ChessGame:
         return legal
 
     def IsCheck(self, color):
-        check = False
         otherColor = BLACK if color == WHITE else WHITE
         pieceCoords = np.where(self.board[:,:,otherColor] != EMPTY)
         kingCoords = np.where(self.board[:,:,color] == KING)
@@ -196,8 +195,8 @@ class ChessGame:
             fileI = pieceCoords[1][i]
             check = self.MoveIsLegal(rankI, fileI, rankO, fileO, otherColor, logError = False)
             if check:
-                break
-        return check
+                return True
+        return False
 
     def IsCheckMate(self, color):
         if not self.IsCheck(color):
