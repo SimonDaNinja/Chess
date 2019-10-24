@@ -64,14 +64,13 @@ class ChessGame:
     def DispState(self):
         dispString = self.error + "\n"
         self.error = ""
-        dispString += "  a b c d e f g h\n"
         for file_ in range(8):
-            dispString += str(file_+1)
+            dispString += str(7-file_+1)
             dispString += ' '
             for rank in range(8):
-                whitePiece = self.board[rank, file_, WHITE]
-                blackPiece = self.board[rank, file_, BLACK]
-                blackSquare = True if ( (rank+file_) % 2 == 0 ) else False
+                whitePiece = self.board[rank, 7-file_, WHITE]
+                blackPiece = self.board[rank, 7-file_, BLACK]
+                blackSquare = False if ( (rank+file_) % 2 == 0 ) else True
                 fColor = '1;37;40' if blackSquare else '0;30;47'
                 if   whitePiece != EMPTY:
                     pieceSymbol = self.SYMBOL_DICT_FILLED[whitePiece] if blackSquare else self.SYMBOL_DICT_EMPTY[whitePiece]
@@ -83,6 +82,7 @@ class ChessGame:
                     dispString += '\x1b[%sm \x1b[0m' % (fColor)
                 dispString += '\x1b[%sm \x1b[0m' % (fColor)
             dispString += '\n'
+        dispString += "  a b c d e f g h\n"
         print(dispString)
 
     def MoveIsLegal(self, rankI, fileI, rankO, fileO, color, logError = True):
