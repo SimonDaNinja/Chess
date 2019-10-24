@@ -223,21 +223,31 @@ class ChessGame:
                     self.board[rankO, fileO, otherColor] = killedPiece
                     if not check:
                         return False
+        return True
 
 
 if __name__ == "__main__":
     chessGame = ChessGame()
     i = 0
+    # In case someone has modified the starting positions,
+    # we want to check if anyone has one in the start of the
+    # game.
+    if   chessGame.IsCheckMate(WHITE):
+        ClearScreen()
+        chessGame.DispState()
+        print("Black has won the game!")
+        exit()
+    elif chessGame.IsCheckMate(BLACK):
+        print("White has won the game!")
+        exit()
     while True:
         color = i%2
-        # TODO: error handling
-        legalInput = False
         while True:
             ClearScreen()
             chessGame.DispState()
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move!")
             rankIStr = input("choose rank! [a-h]: ").lower()
-            if rankIStr in "abcdefgh":
+            if rankIStr in "abcdefgh" and not rankIStr=="":
                 rankI = chessGame.RANK_DICTIONARY[rankIStr]
                 break
             else:
@@ -246,9 +256,10 @@ if __name__ == "__main__":
         while True:
             ClearScreen()
             chessGame.DispState()
+            chessGame.IsCheckMate(WHITE)
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move!")
             fileIStr = input("choose file! [1-8]: ").lower()
-            if fileIStr in "12345678":
+            if fileIStr in "12345678" and not rankIStr=="":
                 fileI = int(fileIStr)-1
                 break
             else:
@@ -259,7 +270,7 @@ if __name__ == "__main__":
             chessGame.DispState()
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move!")
             rankOStr = input("choose rank! [a-h]: ").lower()
-            if rankIStr in "abcdefgh":
+            if rankIStr in "abcdefgh" and not rankIStr=="":
                 rankO = chessGame.RANK_DICTIONARY[rankOStr]
                 break
             else:
@@ -270,7 +281,7 @@ if __name__ == "__main__":
             chessGame.DispState()
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move!")
             fileOStr = input("choose file! [1-8]: ").lower()
-            if fileOStr in "12345678":
+            if fileOStr in "12345678" and not rankIStr=="":
                 fileO = int(fileOStr)-1
                 break
             else:
@@ -279,11 +290,11 @@ if __name__ == "__main__":
         legalMove = chessGame.Move(rankI, fileI, rankO, fileO, color)
         if legalMove:
             i += 1
-        if   chessGame.IsCheckMate(WHITE):
-            ClearScreen()
-            chessGame.DispState()
-            print("Black has won the game!")
-            exit()
-        elif chessGame.IsCheckMate(BLACK):
-            print("White has won the game!")
-            exit()
+            if   chessGame.IsCheckMate(WHITE):
+                ClearScreen()
+                chessGame.DispState()
+                print("Black has won the game!")
+                exit()
+            elif chessGame.IsCheckMate(BLACK):
+                print("White has won the game!")
+                exit()
