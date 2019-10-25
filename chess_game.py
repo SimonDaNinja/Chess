@@ -180,7 +180,7 @@ class ChessGame:
 
     def Move(self, fileI, rankI, fileO, rankO, color):
         piece = self.board[fileI, rankI, color]
-        otherColor = int(not(color))
+        otherColor = BLACK if color == WHITE else BLACK
         legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color)
 
         if legal:
