@@ -72,7 +72,7 @@ class ChessGame:
                 whitePiece = self.board[file_, 7-rank, WHITE]
                 blackPiece = self.board[file_, 7-rank, BLACK]
                 blackSquare = False if ( (file_+rank) % 2 == 0 ) else True
-                fColor = '1;37;40' if blackSquare else '0;30;47'
+                fColor = '1;37;40' if blackSquare else '0;30;107'
                 if   whitePiece != EMPTY:
                     pieceSymbol = self.SYMBOL_DICT_FILLED[whitePiece] if blackSquare else self.SYMBOL_DICT_EMPTY[whitePiece]
                     dispString += '\x1b[%sm%s\x1b[0m' % (fColor, pieceSymbol)
@@ -310,5 +310,7 @@ if __name__ == "__main__":
                 print("Black has won the game!")
                 exit()
             elif chessGame.IsCheckMate(BLACK):
+                ClearScreen()
+                chessGame.DispState()
                 print("White has won the game!")
                 exit()
