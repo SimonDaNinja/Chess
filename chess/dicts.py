@@ -127,5 +127,7 @@ MOVE_DICT = {   ROOK:       {( 0, 1),
                             ( 1, 1),
                             ( 1,-1),
                             (-1, 1),
-                            (-1,-1)}}
+                            (-1,-1),
+                            ( 0, 2),
+                            ( 0,-2)}}
 MOVE_DICT[QUEEN] = MOVE_DICT[ROOK]|MOVE_DICT[BISHOP]
