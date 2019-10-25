@@ -40,7 +40,7 @@ class ChessGame:
         self.board[ G, 1, WHITE ] = PAWN
         self.board[ H, 1, WHITE ] = PAWN
 
-        # place all black pieces
+       # place all black pieces
         self.board[ A, 7, BLACK ] = ROOK
         self.board[ B, 7, BLACK ] = KNIGHT
         self.board[ C, 7, BLACK ] = BISHOP
@@ -112,10 +112,19 @@ class ChessGame:
             legal = self.IsLegalPawn(fileI, rankI, fileO, rankO, color)
         elif piece == KNIGHT:
             legal = self.IsLegalKnight(fileI, rankI, fileO, rankO)
+        elif piece == KING:
+            legal = self.IsLegalKing(fileI, rankI, fileO, rankO)
         else:
             legal = self.IsLegalQueen(fileI, rankI, fileO, rankO)
         if logError: self.error = "" if legal else "Illegal move!"
         return legal
+
+    def IsLegalKing(self, fileI, rankI, fileO, rankO):
+        move = (fileO-fileI,rankO-rankI)
+        if move in self.MOVE_DICT[KING]:
+            return True
+        else:
+            return False
 
     def IsLegalQueen(self, fileI, rankI, fileO, rankO):
         if self.IsLegalRook(fileI, rankI, fileO, rankO):
@@ -218,10 +227,12 @@ class ChessGame:
             rankI = pieceCoords[1][i]
             piece = self.board[fileI,rankI,color]
             for move in self.MOVE_DICT[piece]:
-                fileO = move[0]
-                rankO = move[1]
+                fileO = fileI + move[0]
+                rankO = rankI + move[1]
                 legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color, logError = False)
                 if legal:
+                    print(f"({self.FILE_DICTIONARY[fileI]},{rankI+1})-->({self.FILE_DICTIONARY[fileO]},{rankO+1})")
+                    input()
                     otherColor = BLACK if color == WHITE else WHITE
                     self.board[fileI, rankI, color] = EMPTY
                     self.board[fileO, rankO, color] = piece
@@ -242,12 +253,15 @@ if __name__ == "__main__":
     # In case someone has modified the starting positions,
     # we want to check if anyone has won in the start of the
     # game.
+
+    # In this case, debugging is a likely motive, and to make
+    # that process easier, the screen is not cleared
     if   chessGame.IsCheckMate(WHITE):
-        ClearScreen()
         chessGame.DispState()
         print("Black has won the game!")
         exit()
     elif chessGame.IsCheckMate(BLACK):
+        chessGame.DispState()
         print("White has won the game!")
         exit()
     while True:

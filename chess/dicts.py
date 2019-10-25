@@ -42,7 +42,7 @@ SYMBOL_DICT_EMPTY = {   BISHOP: chr(9815),
                         QUEEN:  chr(9813),
                         ROOK:   chr(9814)}
 
-MOVE_DICT = {   ROOK:       {( 0, 1),
+MOVE_DICT = {   ROOK:      {( 0, 1),
                             ( 0, 2),
                             ( 0, 3),
                             ( 0, 4),
