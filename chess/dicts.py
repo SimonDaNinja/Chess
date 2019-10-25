@@ -9,7 +9,7 @@ PIECE_DICTIONARY = { EMPTY: "empty",
                      PAWN:  "pawn",
                      QUEEN: "queen",
                      ROOK:  "rook"}
-RANK_DICTIONARY = { 
+FILE_DICTIONARY = { 
                     A:"a",
                     B:"b",
                     C:"c",

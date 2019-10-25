@@ -16,7 +16,7 @@ class ChessGame:
 
     from chess.dicts import COLOR_DICTIONARY
     from chess.dicts import PIECE_DICTIONARY
-    from chess.dicts import RANK_DICTIONARY
+    from chess.dicts import FILE_DICTIONARY
     from chess.dicts import SYMBOL_DICT_FILLED
     from chess.dicts import SYMBOL_DICT_EMPTY
     from chess.dicts import MOVE_DICT
@@ -65,13 +65,13 @@ class ChessGame:
         dispString = self.error + "\n"
         dispString += "  a b c d e f g h\n"
         self.error = ""
-        for file_ in range(8):
-            dispString += str(7-file_+1)
+        for rank in range(8):
+            dispString += str(7-rank+1)
             dispString += ' '
-            for rank in range(8):
-                whitePiece = self.board[rank, 7-file_, WHITE]
-                blackPiece = self.board[rank, 7-file_, BLACK]
-                blackSquare = False if ( (rank+file_) % 2 == 0 ) else True
+            for file_ in range(8):
+                whitePiece = self.board[file_, 7-rank, WHITE]
+                blackPiece = self.board[file_, 7-rank, BLACK]
+                blackSquare = False if ( (file_+rank) % 2 == 0 ) else True
                 fColor = '1;37;40' if blackSquare else '0;30;47'
                 if   whitePiece != EMPTY:
                     pieceSymbol = self.SYMBOL_DICT_FILLED[whitePiece] if blackSquare else self.SYMBOL_DICT_EMPTY[whitePiece]
@@ -82,119 +82,119 @@ class ChessGame:
                 else:
                     dispString += '\x1b[%sm \x1b[0m' % (fColor)
                 dispString += '\x1b[%sm \x1b[0m' % (fColor)
-            dispString += str(7-file_+1)
+            dispString += str(7-rank+1)
             dispString += ' '
             dispString += '\n'
         dispString += "  a b c d e f g h\n"
         print(dispString)
 
-    def IsLegalMove(self, rankI, fileI, rankO, fileO, color, logError = True):
+    def IsLegalMove(self, fileI, rankI, fileO, rankO, color, logError = True):
         otherColor = int(not(color))
-        piece = self.board[rankI, fileI, color]
+        piece = self.board[fileI, rankI, color]
 
-        if (rankI not in range(8)) or (fileI not in range(8)):
+        if (fileI not in range(8)) or (rankI not in range(8)):
             print()
-            if logError: self.error = f"({self.RANK_DICTIONARY[rankI]}, {fileI}) is out of bounds"
+            if logError: self.error = f"({self.FILE_DICTIONARY[fileI]}, {rankI}) is out of bounds"
             return False
-        elif (rankO not in range(8)) or (fileO not in range(8)):
-            if logError: self.error = f"({self.RANK_DICTIONARY[rankO]}, {fileO}) is out of bounds"
+        elif (fileO not in range(8)) or (rankO not in range(8)):
+            if logError: self.error = f"({self.FILE_DICTIONARY[fileO]}, {rankO}) is out of bounds"
             return False
         elif (piece == EMPTY):
-            if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.RANK_DICTIONARY[rankI]}, {fileI+1})"
+            if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
             return False
-        elif (rankI==rankO) and (fileI == fileO):
+        elif (fileI==fileO) and (rankI == rankO):
             if logError: self.error = f"Have to move piece to new position!"
             return False
-        elif self.board[rankO, fileO, color] != EMPTY:
+        elif self.board[fileO, rankO, color] != EMPTY:
             if logError: self.error = f"Friendly fire is not allowed!"
             return False
         elif piece == ROOK:
-            legal = self.IsLegalRook(rankI, fileI, rankO, fileO)
+            legal = self.IsLegalRook(fileI, rankI, fileO, rankO)
         elif piece == BISHOP:
-            legal = self.IsLegalBishop(rankI, fileI, rankO, fileO)
+            legal = self.IsLegalBishop(fileI, rankI, fileO, rankO)
         elif piece == PAWN:
-            legal = self.IsLegalPawn(rankI, fileI, rankO, fileO, color)
+            legal = self.IsLegalPawn(fileI, rankI, fileO, rankO, color)
         elif piece == KNIGHT:
-            legal = self.IsLegalKnight(rankI, fileI, rankO, fileO)
+            legal = self.IsLegalKnight(fileI, rankI, fileO, rankO)
         else:
-            legal = self.IsLegalQueen(rankI, fileI, rankO, fileO)
+            legal = self.IsLegalQueen(fileI, rankI, fileO, rankO)
         if logError: self.error = "" if legal else "Illegal move!"
         return legal
 
-    def IsLegalQueen(self, rankI, fileI, rankO, fileO):
-        if self.IsLegalRook(rankI, fileI, rankO, fileO):
+    def IsLegalQueen(self, fileI, rankI, fileO, rankO):
+        if self.IsLegalRook(fileI, rankI, fileO, rankO):
             return True
-        elif self.IsLegalBishop(rankI, fileI, rankO, fileO):
+        elif self.IsLegalBishop(fileI, rankI, fileO, rankO):
             return True
         else:
             return False
 
-    def IsLegalRook(self, rankI, fileI, rankO, fileO):
-        move = (rankO-rankI,fileO-fileI)
+    def IsLegalRook(self, fileI, rankI, fileO, rankO):
+        move = (fileO-fileI,rankO-rankI)
         if not move in self.MOVE_DICT[ROOK]:
             return False
         legal = True
-        if rankI == rankO:
-            maxFile = max(fileI,fileO)
-            minFile = min(fileI,fileO)
-            for file_ in range(minFile+1, maxFile):
-                legal = self.board[rankI, file_, WHITE]==EMPTY and self.board[rankI, file_, BLACK]==EMPTY
-                if not legal:
-                    return legal
-        else:
+        if fileI == fileO:
             maxRank = max(rankI,rankO)
             minRank = min(rankI,rankO)
             for rank in range(minRank+1, maxRank):
-                legal = legal and self.board[rank, fileI, WHITE]==EMPTY and self.board[rank, fileI, BLACK]==EMPTY
+                legal = self.board[fileI, rank, WHITE]==EMPTY and self.board[fileI, rank, BLACK]==EMPTY
+                if not legal:
+                    return legal
+        else:
+            maxFile = max(fileI,fileO)
+            minFile = min(fileI,fileO)
+            for file_ in range(minFile+1, maxFile):
+                legal = legal and self.board[file_, rankI, WHITE]==EMPTY and self.board[file_, rankI, BLACK]==EMPTY
                 if not legal:
                     return legal
         return legal
 
-    def IsLegalBishop(self, rankI, fileI, rankO, fileO):
-        move = (rankO-rankI,fileO-fileI)
+    def IsLegalBishop(self, fileI, rankI, fileO, rankO):
+        move = (fileO-fileI,rankO-rankI)
         if not move in self.MOVE_DICT[BISHOP]:
             return False
         legal = True
-        rankSign = np.sign(rankO-rankI)
         fileSign = np.sign(fileO-fileI)
-        distance = abs(rankO-rankI)
+        rankSign = np.sign(rankO-rankI)
+        distance = abs(fileO-fileI)
         for i in range(1,distance):
-            legal = self.board[rankI + rankSign*i, fileI + fileSign*i, WHITE]==EMPTY and self.board[ rankI + rankSign*i, fileI + fileSign*i, BLACK]==EMPTY
+            legal = self.board[fileI + fileSign*i, rankI + rankSign*i, WHITE]==EMPTY and self.board[ fileI + fileSign*i, rankI + rankSign*i, BLACK]==EMPTY
             if not legal:
                 return legal
         return legal
 
-    def IsLegalKnight(self, rankI, fileI, rankO, fileO):
-        move = (rankO-rankI,fileO-fileI)
+    def IsLegalKnight(self, fileI, rankI, fileO, rankO):
+        move = (fileO-fileI,rankO-rankI)
         return move in self.MOVE_DICT[KNIGHT]
 
-    def IsLegalPawn(self, rankI, fileI, rankO, fileO, color):
-        move = (rankO-rankI,fileO-fileI)
+    def IsLegalPawn(self, fileI, rankI, fileO, rankO, color):
+        move = (fileO-fileI,rankO-rankI)
         legal = False
         direction = -1 if color == BLACK else 1
         otherColor = WHITE if color == BLACK else BLACK
         if   move == ( 0, direction):
-            legal = True if self.board[rankO, fileO, otherColor] == EMPTY else False
+            legal = True if self.board[fileO, rankO, otherColor] == EMPTY else False
         elif move == ( 1, direction) or move == (-1, direction): 
-            legal = True if self.board[rankO, fileO, otherColor] != EMPTY else False
-        elif move == ( 0, 2*direction) and 3*direction % 7 == fileO:
-            legal = True if self.board[rankO, fileO, otherColor] == EMPTY else False
+            legal = True if self.board[fileO, rankO, otherColor] != EMPTY else False
+        elif move == ( 0, 2*direction) and 3*direction % 7 == rankO:
+            legal = True if self.board[fileO, rankO, otherColor] == EMPTY else False
         return legal
 
-    def Move(self, rankI, fileI, rankO, fileO, color):
-        piece = self.board[rankI, fileI, color]
+    def Move(self, fileI, rankI, fileO, rankO, color):
+        piece = self.board[fileI, rankI, color]
         otherColor = int(not(color))
-        legal = self.IsLegalMove(rankI, fileI, rankO, fileO, color)
+        legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color)
 
         if legal:
-            self.board[rankI, fileI, color] = EMPTY
-            self.board[rankO, fileO, color] = piece
-            killedPiece = self.board[rankO, fileO, otherColor]
-            self.board[rankO, fileO, otherColor] = EMPTY
+            self.board[fileI, rankI, color] = EMPTY
+            self.board[fileO, rankO, color] = piece
+            killedPiece = self.board[fileO, rankO, otherColor]
+            self.board[fileO, rankO, otherColor] = EMPTY
             if self.IsCheck(color):
-                self.board[rankI, fileI, color] = piece
-                self.board[rankO, fileO, color] = EMPTY
-                self.board[rankO, fileO, otherColor] = killedPiece
+                self.board[fileI, rankI, color] = piece
+                self.board[fileO, rankO, color] = EMPTY
+                self.board[fileO, rankO, otherColor] = killedPiece
                 self.error = "Can't put yourself in check"
                 return False
         return legal
@@ -203,12 +203,12 @@ class ChessGame:
         otherColor = BLACK if color == WHITE else WHITE
         pieceCoords = np.where(self.board[:,:,otherColor] != EMPTY)
         kingCoords = np.where(self.board[:,:,color] == KING)
-        rankO = kingCoords[0][0]
-        fileO = kingCoords[1][0]
+        fileO = kingCoords[0][0]
+        rankO = kingCoords[1][0]
         for i in range(pieceCoords[0].size):
-            rankI = pieceCoords[0][i]
-            fileI = pieceCoords[1][i]
-            check = self.IsLegalMove(rankI, fileI, rankO, fileO, otherColor, logError = False)
+            fileI = pieceCoords[0][i]
+            rankI = pieceCoords[1][i]
+            check = self.IsLegalMove(fileI, rankI, fileO, rankO, otherColor, logError = False)
             if check:
                 return True
         return False
@@ -218,23 +218,23 @@ class ChessGame:
             return False
         pieceCoords = np.where(self.board[:,:,color] != EMPTY)
         for i in range(pieceCoords[0].size):
-            rankI = pieceCoords[0][i]
-            fileI = pieceCoords[1][i]
-            piece = self.board[rankI,fileI,color]
+            fileI = pieceCoords[0][i]
+            rankI = pieceCoords[1][i]
+            piece = self.board[fileI,rankI,color]
             for move in self.MOVE_DICT[piece]:
-                rankO = move[0]
-                fileO = move[1]
-                legal = self.IsLegalMove(rankI, fileI, rankO, fileO, color, logError = False)
+                fileO = move[0]
+                rankO = move[1]
+                legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color, logError = False)
                 if legal:
                     otherColor = BLACK if color == WHITE else WHITE
-                    self.board[rankI, fileI, color] = EMPTY
-                    self.board[rankO, fileO, color] = piece
-                    killedPiece = self.board[rankO, fileO, otherColor]
-                    self.board[rankO, fileO, otherColor] = EMPTY
+                    self.board[fileI, rankI, color] = EMPTY
+                    self.board[fileO, rankO, color] = piece
+                    killedPiece = self.board[fileO, rankO, otherColor]
+                    self.board[fileO, rankO, otherColor] = EMPTY
                     check = self.IsCheck(color)
-                    self.board[rankI, fileI, color] = piece
-                    self.board[rankO, fileO, color] = EMPTY
-                    self.board[rankO, fileO, otherColor] = killedPiece
+                    self.board[fileI, rankI, color] = piece
+                    self.board[fileO, rankO, color] = EMPTY
+                    self.board[fileO, rankO, otherColor] = killedPiece
                     if not check:
                         return False
         return True
@@ -260,48 +260,48 @@ if __name__ == "__main__":
             ClearScreen()
             chessGame.DispState()
             print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move")
-            rankIStr = input("choose rank [a-h]: ").lower()
-            if rankIStr in "abcdefgh" and not rankIStr=="":
-                rankI = chessGame.RANK_DICTIONARY[rankIStr]
+            fileIStr = input("choose file [a-h]: ").lower()
+            if fileIStr in "abcdefgh" and not fileIStr=="":
+                fileI = chessGame.FILE_DICTIONARY[fileIStr]
                 break
             else:
-                chessGame.error = "rank must be in [a-h]!"
+                chessGame.error = "file must be in [a-h]!"
 
         while True:
             ClearScreen()
             chessGame.DispState()
             chessGame.IsCheckMate(WHITE)
-            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move!")
-            fileIStr = input("choose file [1-8]: ").lower()
-            if fileIStr in "12345678" and not rankIStr=="":
-                fileI = int(fileIStr)-1
+            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect piece to move")
+            rankIStr = input("choose rank [1-8]: ").lower()
+            if rankIStr in "12345678" and not rankIStr=="":
+                rankI = int(rankIStr)-1
                 break
             else:
-                chessGame.error = "file must be in [1-8]!"
+                chessGame.error = "rank must be in [1-8]!"
 
         while True:
             ClearScreen()
             chessGame.DispState()
-            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move!")
-            rankOStr = input("choose rank [a-h]: ").lower()
-            if rankIStr in "abcdefgh" and not rankIStr=="":
-                rankO = chessGame.RANK_DICTIONARY[rankOStr]
+            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move")
+            fileOStr = input("choose file [a-h]: ").lower()
+            if fileOStr in "abcdefgh" and not fileOStr=="":
+                fileO = chessGame.FILE_DICTIONARY[fileOStr]
                 break
             else:
-                chessGame.error = "rank must be in [a-h]!"
+                chessGame.error = "file must be in [a-h]!"
 
         while True:
             ClearScreen()
             chessGame.DispState()
-            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move!")
-            fileOStr = input("choose file [1-8]: ").lower()
-            if fileOStr in "12345678" and not rankIStr=="":
-                fileO = int(fileOStr)-1
+            print(f"It is {chessGame.COLOR_DICTIONARY[color]}'s turn\nSelect where to move")
+            rankOStr = input("choose rank [1-8]: ").lower()
+            if rankOStr in "12345678" and not rankOStr=="":
+                rankO = int(rankOStr)-1
                 break
             else:
-                chessGame.error = "file must be in [1-8]!"
+                chessGame.error = "rank must be in [1-8]!"
 
-        legalMove = chessGame.Move(rankI, fileI, rankO, fileO, color)
+        legalMove = chessGame.Move(fileI, rankI, fileO, rankO, color)
         if legalMove:
             i += 1
             if   chessGame.IsCheckMate(WHITE):
