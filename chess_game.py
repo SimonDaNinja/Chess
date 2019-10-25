@@ -241,7 +241,7 @@ if __name__ == "__main__":
     chessGame = ChessGame()
     i = 0
     # In case someone has modified the starting positions,
-    # we want to check if anyone has one in the start of the
+    # we want to check if anyone has won in the start of the
     # game.
     if   chessGame.IsCheckMate(WHITE):
         ClearScreen()
