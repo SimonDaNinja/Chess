@@ -114,8 +114,11 @@ class ChessGame:
             legal = self.IsLegalKnight(fileI, rankI, fileO, rankO)
         elif piece == KING:
             legal = self.IsLegalKing(fileI, rankI, fileO, rankO)
-        else:
+        elif piece == QUEEN:
             legal = self.IsLegalQueen(fileI, rankI, fileO, rankO)
+        else:
+            print("critical: unknown piece!\nShutting down game...")
+            exit()
         if logError: self.error = "" if legal else "Illegal move!"
         return legal
 
