@@ -122,5 +122,10 @@ MOVE_DICT = {   ROOK:       {( 0, 1),
                             ( 0,-1),
                             ( 1,-1),
                             (-1, 1)},
-                    PAWN:{}}
+                    PAWN:{  ( 0, 1),
+                            ( 0,-1),
+                            ( 1, 1),
+                            ( 1,-1),
+                            (-1, 1),
+                            (-1,-1)}}
 MOVE_DICT[QUEEN] = MOVE_DICT[ROOK]|MOVE_DICT[BISHOP]
