@@ -3,9 +3,6 @@ import numpy as np
 from chess.constants import *
 import os
 
-# vertical rows are called FILES
-# horizontal rows are called RANKS
-
 def ClearScreen():
     if os.name == 'posix':
         os.system('clear')
