@@ -90,7 +90,6 @@ class ChessGame:
         piece = self.board[fileI, rankI, color]
 
         if (fileI not in range(8)) or (rankI not in range(8)):
-            print()
             if logError: self.error = f"({self.FILE_DICTIONARY[fileI]}, {rankI}) is out of bounds"
             return False
         elif (fileO not in range(8)) or (rankO not in range(8)):
@@ -180,7 +179,7 @@ class ChessGame:
 
     def Move(self, fileI, rankI, fileO, rankO, color):
         piece = self.board[fileI, rankI, color]
-        otherColor = BLACK if color == WHITE else BLACK
+        otherColor = BLACK if color == WHITE else WHITE
         legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color)
 
         if legal:
