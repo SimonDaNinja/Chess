@@ -19,8 +19,19 @@ class ChessGame:
     from chess.dicts import MOVE_DICT
 
     def __init__(self):
+
         self.board = np.full((8,8,2),EMPTY)
         self.error = ""
+
+        # Emulating switch-case using a dict mapping pieces to functions
+        self.IS_LEGAL_SWITCH = {
+                                    ROOK:self.IsLegalRook,
+                                    BISHOP:self.IsLegalBishop,
+                                    PAWN:self.IsLegalPawn,
+                                    KNIGHT:self.IsLegalKnight,
+                                    KING:self.IsLegalKing,
+                                    QUEEN:self.IsLegalQueen,
+                                }
 
         # place all white pieces
         self.board[ A, 0, WHITE ] = ROOK
@@ -86,58 +97,50 @@ class ChessGame:
         print(dispString)
 
     def IsLegalMove(self, fileI, rankI, fileO, rankO, color, logError = True):
-        otherColor = int(not(color))
         piece = self.board[fileI, rankI, color]
 
+        # Pre-checks
         if (fileI not in range(8)) or (rankI not in range(8)):
             if logError: self.error = f"({self.FILE_DICTIONARY[fileI]}, {rankI}) is out of bounds"
             return False
-        elif (fileO not in range(8)) or (rankO not in range(8)):
+        if (fileO not in range(8)) or (rankO not in range(8)):
             if logError: self.error = f"({self.FILE_DICTIONARY[fileO]}, {rankO}) is out of bounds"
             return False
-        elif (piece == EMPTY):
+        if (piece == EMPTY):
             if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
             return False
-        elif (fileI==fileO) and (rankI == rankO):
+        if (fileI==fileO) and (rankI == rankO):
             if logError: self.error = f"Have to move piece to new position!"
             return False
-        elif self.board[fileO, rankO, color] != EMPTY:
+        if self.board[fileO, rankO, color] != EMPTY:
             if logError: self.error = f"Friendly fire is not allowed!"
             return False
-        elif piece == ROOK:
-            legal = self.IsLegalRook(fileI, rankI, fileO, rankO)
-        elif piece == BISHOP:
-            legal = self.IsLegalBishop(fileI, rankI, fileO, rankO)
-        elif piece == PAWN:
-            legal = self.IsLegalPawn(fileI, rankI, fileO, rankO, color)
-        elif piece == KNIGHT:
-            legal = self.IsLegalKnight(fileI, rankI, fileO, rankO)
-        elif piece == KING:
-            legal = self.IsLegalKing(fileI, rankI, fileO, rankO)
-        elif piece == QUEEN:
-            legal = self.IsLegalQueen(fileI, rankI, fileO, rankO)
+
+        # Emulating switch-case using a dict mapping pieces to functions
+        if piece in self.IS_LEGAL_SWITCH:
+            legal = self.IS_LEGAL_SWITCH[piece](fileI, rankI, fileO, rankO, color)
         else:
             print("critical: unknown piece!\nShutting down game...")
             exit()
         if logError: self.error = "" if legal else "Illegal move!"
         return legal
 
-    def IsLegalKing(self, fileI, rankI, fileO, rankO):
+    def IsLegalKing(self, fileI, rankI, fileO, rankO, color):
         move = (fileO-fileI,rankO-rankI)
         if move in self.MOVE_DICT[KING]:
             return True
         else:
             return False
 
-    def IsLegalQueen(self, fileI, rankI, fileO, rankO):
-        if self.IsLegalRook(fileI, rankI, fileO, rankO):
+    def IsLegalQueen(self, fileI, rankI, fileO, rankO, color):
+        if self.IsLegalRook(fileI, rankI, fileO, rankO, color):
             return True
-        elif self.IsLegalBishop(fileI, rankI, fileO, rankO):
+        elif self.IsLegalBishop(fileI, rankI, fileO, rankO, color):
             return True
         else:
             return False
 
-    def IsLegalRook(self, fileI, rankI, fileO, rankO):
+    def IsLegalRook(self, fileI, rankI, fileO, rankO, color):
         move = (fileO-fileI,rankO-rankI)
         if not move in self.MOVE_DICT[ROOK]:
             return False
@@ -158,7 +161,7 @@ class ChessGame:
                     return legal
         return legal
 
-    def IsLegalBishop(self, fileI, rankI, fileO, rankO):
+    def IsLegalBishop(self, fileI, rankI, fileO, rankO, color):
         move = (fileO-fileI,rankO-rankI)
         if not move in self.MOVE_DICT[BISHOP]:
             return False
@@ -172,7 +175,7 @@ class ChessGame:
                 return legal
         return legal
 
-    def IsLegalKnight(self, fileI, rankI, fileO, rankO):
+    def IsLegalKnight(self, fileI, rankI, fileO, rankO, color):
         move = (fileO-fileI,rankO-rankI)
         return move in self.MOVE_DICT[KNIGHT]
 
