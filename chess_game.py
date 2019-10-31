@@ -24,13 +24,14 @@ class ChessGame:
         self.error = ""
 
         # Emulating switch-case using a dict mapping pieces to functions
+        # The switch is used in IsLegalMove()
         self.IS_LEGAL_SWITCH = {
-                                    ROOK:self.IsLegalRook,
-                                    BISHOP:self.IsLegalBishop,
-                                    PAWN:self.IsLegalPawn,
-                                    KNIGHT:self.IsLegalKnight,
-                                    KING:self.IsLegalKing,
-                                    QUEEN:self.IsLegalQueen,
+                                    ROOK:   self.IsLegalRook,
+                                    BISHOP: self.IsLegalBishop,
+                                    PAWN:   self.IsLegalPawn,
+                                    KNIGHT: self.IsLegalKnight,
+                                    KING:   self.IsLegalKing,
+                                    QUEEN:  self.IsLegalQueen,
                                 }
 
         # place all white pieces
@@ -120,6 +121,7 @@ class ChessGame:
         if piece in self.IS_LEGAL_SWITCH:
             legal = self.IS_LEGAL_SWITCH[piece](fileI, rankI, fileO, rankO, color)
         else:
+            # Corresponds to default case
             print("critical: unknown piece!\nShutting down game...")
             exit()
         if logError: self.error = "" if legal else "Illegal move!"
