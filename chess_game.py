@@ -98,7 +98,6 @@ class ChessGame:
         print(dispString)
 
     def IsLegalMove(self, fileI, rankI, fileO, rankO, color, logError = True):
-        piece = self.board[fileI, rankI, color]
 
         # Pre-checks
         if (fileI not in range(8)) or (rankI not in range(8)):
@@ -107,6 +106,7 @@ class ChessGame:
         if (fileO not in range(8)) or (rankO not in range(8)):
             if logError: self.error = f"({self.FILE_DICTIONARY[fileO]}, {rankO}) is out of bounds"
             return False
+        piece = self.board[fileI, rankI, color]
         if (piece == EMPTY):
             if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
             return False
