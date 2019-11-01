@@ -20,7 +20,7 @@ class ChessGame:
 
     def __init__(self):
 
-        self.board = np.full((8,8,2),EMPTY)
+        self.board = np.full((8,8,2*6),EMPTY)
         self.error = ""
 
         # Emulating switch-case using a dict mapping pieces to functions
@@ -35,40 +35,40 @@ class ChessGame:
                                 }
 
         # place all white pieces
-        self.board[ A, 0, WHITE ] = ROOK
-        self.board[ B, 0, WHITE ] = KNIGHT
-        self.board[ C, 0, WHITE ] = BISHOP
-        self.board[ D, 0, WHITE ] = QUEEN
-        self.board[ E, 0, WHITE ] = KING
-        self.board[ F, 0, WHITE ] = BISHOP
-        self.board[ G, 0, WHITE ] = KNIGHT
-        self.board[ H, 0, WHITE ] = ROOK
-        self.board[ A, 1, WHITE ] = PAWN
-        self.board[ B, 1, WHITE ] = PAWN
-        self.board[ C, 1, WHITE ] = PAWN
-        self.board[ D, 1, WHITE ] = PAWN
-        self.board[ E, 1, WHITE ] = PAWN
-        self.board[ F, 1, WHITE ] = PAWN
-        self.board[ G, 1, WHITE ] = PAWN
-        self.board[ H, 1, WHITE ] = PAWN
+        self.board[ A, 0, WHITE*6 + ROOK ] = 1.0
+        self.board[ B, 0, WHITE*6 + KNIGHT ] = 1.0
+        self.board[ C, 0, WHITE*6 + BISHOP ] = 1.0
+        self.board[ D, 0, WHITE*6 + QUEEN ] = 1.0
+        self.board[ E, 0, WHITE*6 + KING ] = 1.0
+        self.board[ F, 0, WHITE*6 + BISHOP ] = 1.0
+        self.board[ G, 0, WHITE*6 + KNIGHT ] = 1.0
+        self.board[ H, 0, WHITE*6 + ROOK ] = 1.0
+        self.board[ A, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ B, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ C, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ D, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ E, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ F, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ G, 1, WHITE*6 + PAWN ] = 1.0
+        self.board[ H, 1, WHITE*6 + PAWN ] = 1.0
 
        # place all black pieces
-        self.board[ A, 7, BLACK ] = ROOK
-        self.board[ B, 7, BLACK ] = KNIGHT
-        self.board[ C, 7, BLACK ] = BISHOP
-        self.board[ D, 7, BLACK ] = QUEEN
-        self.board[ E, 7, BLACK ] = KING
-        self.board[ F, 7, BLACK ] = BISHOP
-        self.board[ G, 7, BLACK ] = KNIGHT
-        self.board[ H, 7, BLACK ] = ROOK
-        self.board[ A, 6, BLACK ] = PAWN
-        self.board[ B, 6, BLACK ] = PAWN
-        self.board[ C, 6, BLACK ] = PAWN
-        self.board[ D, 6, BLACK ] = PAWN
-        self.board[ E, 6, BLACK ] = PAWN
-        self.board[ F, 6, BLACK ] = PAWN
-        self.board[ G, 6, BLACK ] = PAWN
-        self.board[ H, 6, BLACK ] = PAWN
+        self.board[ A, 7, BLACK*6 + ROOK ] = 1.0
+        self.board[ B, 7, BLACK*6 + KNIGHT ] = 1.0
+        self.board[ C, 7, BLACK*6 + BISHOP ] = 1.0
+        self.board[ D, 7, BLACK*6 + QUEEN ] = 1.0
+        self.board[ E, 7, BLACK*6 + KING ] = 1.0
+        self.board[ F, 7, BLACK*6 + BISHOP ] = 1.0
+        self.board[ G, 7, BLACK*6 + KNIGHT ] = 1.0
+        self.board[ H, 7, BLACK*6 + ROOK ] = 1.0
+        self.board[ A, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ B, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ C, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ D, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ E, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ F, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ G, 6, BLACK*6 + PAWN ] = 1.0
+        self.board[ H, 6, BLACK*6 + PAWN ] = 1.0
 
     def DispState(self):
         dispString = self.error + "\n"
@@ -78,18 +78,26 @@ class ChessGame:
             dispString += str(7-rank+1)
             dispString += ' '
             for file_ in range(8):
-                whitePiece = self.board[file_, 7-rank, WHITE]
-                blackPiece = self.board[file_, 7-rank, BLACK]
+                where = np.where(self.board[file_, rank, :]!=EMPTY)[0]
+                print(self.board[file_, rank, :])
+                print(self.board.shape)
+                if where.size == 0:
+                    piece = EMPTY
+                    pieceColor = None
+                else:
+                    piece = (where[0] % 6) # There are 6 kinds of pieces in chess; each contributes a channel per color
+                    pieceColor = WHITE if piece in range(WHITE*6, WHITE*6+6) else BLACK
+
                 blackSquare = False if ( (file_+rank) % 2 == 0 ) else True
                 fColor = '1;37;40' if blackSquare else '0;30;107'
-                if   whitePiece != EMPTY:
-                    pieceSymbol = self.SYMBOL_DICT_FILLED[whitePiece] if blackSquare else self.SYMBOL_DICT_EMPTY[whitePiece]
-                    dispString += '\x1b[%sm%s\x1b[0m' % (fColor, pieceSymbol)
-                elif blackPiece != EMPTY:
-                    pieceSymbol = self.SYMBOL_DICT_EMPTY[blackPiece] if blackSquare else self.SYMBOL_DICT_FILLED[blackPiece]
-                    dispString += '\x1b[%sm%s\x1b[0m' % (fColor, pieceSymbol)
+
+                if pieceColor is None:
+                    pieceSymbol = ' '
+                elif pieceColor == WHITE:
+                    pieceSymbol = self.SYMBOL_DICT_FILLED[piece] if blackSquare else self.SYMBOL_DICT_EMPTY[piece]
                 else:
-                    dispString += '\x1b[%sm \x1b[0m' % (fColor)
+                    pieceSymbol = self.SYMBOL_DICT_EMPTY[piece] if blackSquare else self.SYMBOL_DICT_FILLED[piece]
+                dispString += '\x1b[%sm%s\x1b[0m' % (fColor, pieceSymbol)
                 dispString += '\x1b[%sm \x1b[0m' % (fColor)
             dispString += str(7-rank+1)
             dispString += ' '
@@ -98,6 +106,10 @@ class ChessGame:
         print(dispString)
 
     def IsLegalMove(self, fileI, rankI, fileO, rankO, color, logError = True):
+
+        with np.where(self.board[ fileI, fileO, color*6:(color*6+6) ] != 0)[0] as where:
+            piece = where[0]
+
         piece = self.board[fileI, rankI, color]
 
         # Pre-checks
@@ -239,8 +251,6 @@ class ChessGame:
                 rankO = rankI + move[1]
                 legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color, logError = False)
                 if legal:
-                    print(f"({self.FILE_DICTIONARY[fileI]},{rankI+1})-->({self.FILE_DICTIONARY[fileO]},{rankO+1})")
-                    input()
                     otherColor = BLACK if color == WHITE else WHITE
                     self.board[fileI, rankI, color] = EMPTY
                     self.board[fileO, rankO, color] = piece
@@ -264,6 +274,7 @@ if __name__ == "__main__":
 
     # In this case, debugging is a likely motive, and to make
     # that process easier, the screen is not cleared
+    chessGame.DispState()
     if   chessGame.IsCheckMate(WHITE):
         chessGame.DispState()
         print("Black has won the game!")

@@ -1,10 +1,10 @@
-EMPTY   = 0
-BISHOP  = 1
-KING    = 2
-KNIGHT  = 3
-PAWN    = 4
-QUEEN   = 5
-ROOK    = 6
+EMPTY   = -1
+BISHOP  = 0
+KING    = 1
+KNIGHT  = 2
+PAWN    = 3
+QUEEN   = 4
+ROOK    = 5
 
 A = 0
 B = 1
