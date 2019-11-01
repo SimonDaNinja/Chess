@@ -20,7 +20,7 @@ class ChessGame:
 
     def __init__(self):
 
-        self.board = np.full((8,8,2*6),EMPTY)
+        self.board = np.zeros((8,8,2*6))
         self.error = ""
 
         # Emulating switch-case using a dict mapping pieces to functions
@@ -79,8 +79,6 @@ class ChessGame:
             dispString += ' '
             for file_ in range(8):
                 where = np.where(self.board[file_, rank, :]!=EMPTY)[0]
-                print(self.board[file_, rank, :])
-                print(self.board.shape)
                 if where.size == 0:
                     piece = EMPTY
                     pieceColor = None
@@ -107,11 +105,6 @@ class ChessGame:
 
     def IsLegalMove(self, fileI, rankI, fileO, rankO, color, logError = True):
 
-        with np.where(self.board[ fileI, fileO, color*6:(color*6+6) ] != 0)[0] as where:
-            piece = where[0]
-
-        piece = self.board[fileI, rankI, color]
-
         # Pre-checks
         if (fileI not in range(8)) or (rankI not in range(8)):
             if logError: self.error = f"({self.FILE_DICTIONARY[fileI]}, {rankI}) is out of bounds"
@@ -119,15 +112,18 @@ class ChessGame:
         if (fileO not in range(8)) or (rankO not in range(8)):
             if logError: self.error = f"({self.FILE_DICTIONARY[fileO]}, {rankO}) is out of bounds"
             return False
-        if (piece == EMPTY):
-            if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
-            return False
+        with np.where(self.board[ fileI, rankI, color*6:(color*6+6) ] != EMPTY)[0] as where:
+            if (where.size == 0):
+                if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
+                return False
+            piece = where[0]
         if (fileI==fileO) and (rankI == rankO):
             if logError: self.error = f"Have to move piece to new position!"
             return False
-        if self.board[fileO, rankO, color] != EMPTY:
-            if logError: self.error = f"Friendly fire is not allowed!"
-            return False
+        with np.where(self.board[ fileO, rankO, color*6:(color*6+6) ] != EMPTY)[0] as where:
+            if (where.size == 0):
+                if logError: self.error = f"Friendly fire is not allowed!"
+                return False
 
         # Emulating switch-case using a dict mapping pieces to functions
         if piece in self.IS_LEGAL_SWITCH:
@@ -158,19 +154,18 @@ class ChessGame:
         move = (fileO-fileI,rankO-rankI)
         if not move in self.MOVE_DICT[ROOK]:
             return False
-        legal = True
         if fileI == fileO:
-            maxRank = max(rankI,rankO)
-            minRank = min(rankI,rankO)
+            maxRank = max(rankI, rankO)
+            minRank = min(rankI, rankO)
             for rank in range(minRank+1, maxRank):
-                legal = self.board[fileI, rank, WHITE]==EMPTY and self.board[fileI, rank, BLACK]==EMPTY
+                legal = (self.board[fileI, rank, :] == 0).all()
                 if not legal:
                     return legal
         else:
             maxFile = max(fileI,fileO)
             minFile = min(fileI,fileO)
             for file_ in range(minFile+1, maxFile):
-                legal = legal and self.board[file_, rankI, WHITE]==EMPTY and self.board[file_, rankI, BLACK]==EMPTY
+                legal = (self.board[fileI, rank, :] == 0).all()
                 if not legal:
                     return legal
         return legal
@@ -184,7 +179,7 @@ class ChessGame:
         rankSign = np.sign(rankO-rankI)
         distance = abs(fileO-fileI)
         for i in range(1,distance):
-            legal = self.board[fileI + fileSign*i, rankI + rankSign*i, WHITE]==EMPTY and self.board[ fileI + fileSign*i, rankI + rankSign*i, BLACK]==EMPTY
+            legal = (self.board[fileI + fileSign*i, rankI + rankSign*i, :] == 0).all()
             if not legal:
                 return legal
         return legal
@@ -199,27 +194,41 @@ class ChessGame:
         direction = -1 if color == BLACK else 1
         otherColor = WHITE if color == BLACK else BLACK
         if   move == ( 0, direction):
-            legal = True if self.board[fileO, rankO, otherColor] == EMPTY else False
+            legal = True if (self.board[fileO, rankO, otherColor*6:(otherColor*6+1)] == 0).all() else False
         elif move == ( 1, direction) or move == (-1, direction): 
-            legal = True if self.board[fileO, rankO, otherColor] != EMPTY else False
+            legal = True if (self.board[fileO, rankO, otherColor*6:(otherColor*6+1)] != 0).any() else False
         elif move == ( 0, 2*direction) and 3*direction % 7 == rankO:
-            legal = True if self.board[fileO, rankO, otherColor] == EMPTY else False
+            legal = True if (self.board[fileO, rankO, otherColor*6:(otherColor*6+1)] == 0).all() else False
         return legal
 
     def Move(self, fileI, rankI, fileO, rankO, color):
-        piece = self.board[fileI, rankI, color]
         otherColor = BLACK if color == WHITE else WHITE
         legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color)
+        with np.where(self.board[ fileI, rankI, color*6:(color*6+6) ] != EMPTY)[0] as where:
+            if (where.size == 0):
+                print("critical: move of empty piece passed legality check! (in Move())")
+                exit()
+            else:
+                piece = where[0]
 
         if legal:
-            self.board[fileI, rankI, color] = EMPTY
-            self.board[fileO, rankO, color] = piece
-            killedPiece = self.board[fileO, rankO, otherColor]
-            self.board[fileO, rankO, otherColor] = EMPTY
+            self.board[fileI, rankI, color*6 + piece] = 0
+            self.board[fileO, rankO, color*6 + piece] = 1
+
+            with np.where(self.board[ fileO, rankO, otherColor*6:(otherColor*6 + 6) ] != EMPTY)[0] as where:
+                if (where.size == 0):
+                    killedPiece = None
+                else:
+                    killedPiece = where[0]
+
+            if killedPiece is not None:
+                self.board[fileO, rankO, otherColor*6+killedPiece] = 0
+
             if self.IsCheck(color):
-                self.board[fileI, rankI, color] = piece
-                self.board[fileO, rankO, color] = EMPTY
-                self.board[fileO, rankO, otherColor] = killedPiece
+                self.board[fileI, rankI, color*6 + piece] = piece
+                self.board[fileO, rankO, color*6 + piece] = 0
+                if killedPiece is not None:
+                    self.board[fileO, rankO, otherColor*6+killedPiece] = killedPiece
                 self.error = "Can't put yourself in check"
                 return False
         return legal
