@@ -239,8 +239,6 @@ class ChessGame:
                 rankO = rankI + move[1]
                 legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color, logError = False)
                 if legal:
-                    print(f"({self.FILE_DICTIONARY[fileI]},{rankI+1})-->({self.FILE_DICTIONARY[fileO]},{rankO+1})")
-                    input()
                     otherColor = BLACK if color == WHITE else WHITE
                     self.board[fileI, rankI, color] = EMPTY
                     self.board[fileO, rankO, color] = piece
