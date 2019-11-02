@@ -78,13 +78,12 @@ class ChessGame:
             dispString += str(7-rank+1)
             dispString += ' '
             for file_ in range(8):
-                where = np.where(self.board[file_, rank, :]!=EMPTY)[0]
+                where = np.where(self.board[file_, 7-rank, :] != 0)[0]
                 if where.size == 0:
-                    piece = EMPTY
                     pieceColor = None
                 else:
                     piece = (where[0] % 6) # There are 6 kinds of pieces in chess; each contributes a channel per color
-                    pieceColor = WHITE if piece in range(WHITE*6, WHITE*6+6) else BLACK
+                    pieceColor = WHITE if where[0] in range(WHITE*6, WHITE*6+6) else BLACK
 
                 blackSquare = False if ( (file_+rank) % 2 == 0 ) else True
                 fColor = '1;37;40' if blackSquare else '0;30;107'
@@ -112,18 +111,18 @@ class ChessGame:
         if (fileO not in range(8)) or (rankO not in range(8)):
             if logError: self.error = f"({self.FILE_DICTIONARY[fileO]}, {rankO}) is out of bounds"
             return False
-        with np.where(self.board[ fileI, rankI, color*6:(color*6+6) ] != EMPTY)[0] as where:
-            if (where.size == 0):
-                if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
-                return False
-            piece = where[0]
+        where = np.where(self.board[ fileI, rankI, color*6:(color*6+6) ] != 0)[0]
+        if (where.size == 0):
+            if logError: self.error = f"No {self.COLOR_DICTIONARY[color]} piece in position ({self.FILE_DICTIONARY[fileI]}, {rankI+1})"
+            return False
+        piece = where[0]
         if (fileI==fileO) and (rankI == rankO):
             if logError: self.error = f"Have to move piece to new position!"
             return False
-        with np.where(self.board[ fileO, rankO, color*6:(color*6+6) ] != EMPTY)[0] as where:
-            if (where.size == 0):
-                if logError: self.error = f"Friendly fire is not allowed!"
-                return False
+        where = np.where(self.board[ fileO, rankO, color*6:(color*6+6) ] != 0)[0]
+        if (where.size != 0):
+            if logError: self.error = f"Friendly fire is not allowed!"
+            return False
 
         # Emulating switch-case using a dict mapping pieces to functions
         if piece in self.IS_LEGAL_SWITCH:
@@ -204,22 +203,22 @@ class ChessGame:
     def Move(self, fileI, rankI, fileO, rankO, color):
         otherColor = BLACK if color == WHITE else WHITE
         legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color)
-        with np.where(self.board[ fileI, rankI, color*6:(color*6+6) ] != EMPTY)[0] as where:
+
+        if legal:
+            where =  np.where(self.board[ fileI, rankI, color*6:(color*6+6) ] != 0)[0]
             if (where.size == 0):
                 print("critical: move of empty piece passed legality check! (in Move())")
                 exit()
             else:
                 piece = where[0]
-
-        if legal:
             self.board[fileI, rankI, color*6 + piece] = 0
             self.board[fileO, rankO, color*6 + piece] = 1
 
-            with np.where(self.board[ fileO, rankO, otherColor*6:(otherColor*6 + 6) ] != EMPTY)[0] as where:
-                if (where.size == 0):
-                    killedPiece = None
-                else:
-                    killedPiece = where[0]
+            where = np.where(self.board[ fileO, rankO, otherColor*6:(otherColor*6 + 6) ] != 0)[0]
+            if (where.size == 0):
+                killedPiece = None
+            else:
+                killedPiece = where[0]
 
             if killedPiece is not None:
                 self.board[fileO, rankO, otherColor*6+killedPiece] = 0
@@ -235,8 +234,8 @@ class ChessGame:
 
     def IsCheck(self, color):
         otherColor = BLACK if color == WHITE else WHITE
-        pieceCoords = np.where(self.board[:,:,otherColor] != EMPTY)
-        kingCoords = np.where(self.board[:,:,color] == KING)
+        pieceCoords = np.where(self.board[:,:,otherColor*6:(otherColor*6 + 6)] != 0)
+        kingCoords = np.where(self.board[:,:,color*6 + KING] == 1)
         fileO = kingCoords[0][0]
         rankO = kingCoords[1][0]
         for i in range(pieceCoords[0].size):
@@ -248,27 +247,34 @@ class ChessGame:
         return False
 
     def IsCheckMate(self, color):
+        # If not in check, it is impossible to be check mate
         if not self.IsCheck(color):
             return False
-        pieceCoords = np.where(self.board[:,:,color] != EMPTY)
+        pieceCoords = np.where(self.board[:,:,color*6:(color*6+6) != 0])
         for i in range(pieceCoords[0].size):
             fileI = pieceCoords[0][i]
             rankI = pieceCoords[1][i]
-            piece = self.board[fileI,rankI,color]
+            piece = pieceCoords[2][i]
             for move in self.MOVE_DICT[piece]:
                 fileO = fileI + move[0]
                 rankO = rankI + move[1]
                 legal = self.IsLegalMove(fileI, rankI, fileO, rankO, color, logError = False)
                 if legal:
                     otherColor = BLACK if color == WHITE else WHITE
-                    self.board[fileI, rankI, color] = EMPTY
-                    self.board[fileO, rankO, color] = piece
-                    killedPiece = self.board[fileO, rankO, otherColor]
-                    self.board[fileO, rankO, otherColor] = EMPTY
+                    self.board[fileI, rankI, color*6 + piece] = 0
+                    self.board[fileO, rankO, color*6 + piece] = 1
+                    where = np.where(self.board[fileO, rankO, otherColor] != 0)
+                    if where[0].size != 0:
+                        killedPiece = where[0]
+                    else:
+                        killedPiece = None
+                    if killedPiece is not None:
+                        self.board[fileO, rankO, otherColor*6+killedPiece] = 0
                     check = self.IsCheck(color)
-                    self.board[fileI, rankI, color] = piece
-                    self.board[fileO, rankO, color] = EMPTY
-                    self.board[fileO, rankO, otherColor] = killedPiece
+                    self.board[fileI, rankI, color*6 + piece] = 1
+                    self.board[fileO, rankO, color*6 + piece] = 0
+                    if killedPiece is not None:
+                        self.board[fileO, rankO, otherColor*6 + piece] = killedPiece
                     if not check:
                         return False
         return True

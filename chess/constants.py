@@ -1,4 +1,3 @@
-EMPTY   = -1
 BISHOP  = 0
 KING    = 1
 KNIGHT  = 2

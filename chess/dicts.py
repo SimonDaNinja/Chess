@@ -2,8 +2,7 @@ from chess.constants import *
 
 COLOR_DICTIONARY = { WHITE:"white",
                      BLACK:"black" }
-PIECE_DICTIONARY = { EMPTY: "empty",
-                     BISHOP:"bishop",
+PIECE_DICTIONARY = { BISHOP:"bishop",
                      KING:  "king",
                      KNIGHT:"knight",
                      PAWN:  "pawn",
