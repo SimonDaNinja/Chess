@@ -255,7 +255,7 @@ class ChessGame:
 
 if __name__ == "__main__":
     chessGame = ChessGame()
-    i = 0
+    color = 0
     # In case someone has modified the starting positions,
     # we want to check if anyone has won in the start of the
     # game.
@@ -271,7 +271,6 @@ if __name__ == "__main__":
         print("White has won the game!")
         exit()
     while True:
-        color = i%2
         while True:
             ClearScreen()
             chessGame.DispState()
@@ -319,7 +318,7 @@ if __name__ == "__main__":
 
         legalMove = chessGame.Move(fileI, rankI, fileO, rankO, color)
         if legalMove:
-            i += 1
+            color ^= 1
             if   chessGame.IsCheckMate(WHITE):
                 ClearScreen()
                 chessGame.DispState()
